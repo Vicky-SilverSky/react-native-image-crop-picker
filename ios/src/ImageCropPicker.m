@@ -866,7 +866,7 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
 - (void)cropImage:(UIImage *)image {
     TOCropViewController *cropVC;
     if ([[[self options] objectForKey:@"cropperCircleOverlay"] boolValue]) {
-        cropVC = [[TOCropViewController alloc] initWithCroppingStyle:TOCropViewCroppingStyleCircular image:image];
+        cropVC = [[TOCropViewController alloc] initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
     } else {
         cropVC = [[TOCropViewController alloc] initWithImage:image];
         CGFloat widthRatio = [[self.options objectForKey:@"width"] floatValue];

@@ -423,41 +423,35 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
     NSString *tmpDirFullPath = [self getTmpDirectory];
     NSString *filePath = [tmpDirFullPath stringByAppendingString:[[NSUUID UUID] UUIDString]];
     filePath = [filePath stringByAppendingString:@".mp4"];
-    NSURL *outputURL = [NSURL fileURLWithPath:filePath];
+    NSURL *outputURL = sourceURL;
+
+    AVAsset *compressedAsset = [AVAsset assetWithURL:outputURL];
+    AVAssetTrack *track = [[compressedAsset tracksWithMediaType:AVMediaTypeVideo] firstObject];
     
-    [self.compression compressVideo:sourceURL outputURL:outputURL withOptions:self.options handler:^(AVAssetExportSession *exportSession) {
-        if (exportSession.status == AVAssetExportSessionStatusCompleted) {
-            AVAsset *compressedAsset = [AVAsset assetWithURL:outputURL];
-            AVAssetTrack *track = [[compressedAsset tracksWithMediaType:AVMediaTypeVideo] firstObject];
-            
-            NSNumber *fileSizeValue = nil;
-            [outputURL getResourceValue:&fileSizeValue
-                                 forKey:NSURLFileSizeKey
-                                  error:nil];
-            
-            AVURLAsset *durationFromUrl = [AVURLAsset assetWithURL:outputURL];
-            CMTime time = [durationFromUrl duration];
-            int milliseconds = ceil(time.value/time.timescale) * 1000;
-            
-            completion([self createAttachmentResponse:[outputURL absoluteString]
-                                             withExif:nil
-                                        withSourceURL:[sourceURL absoluteString]
-                                  withLocalIdentifier:localIdentifier
-                                         withFilename:fileName
-                                            withWidth:[NSNumber numberWithFloat:track.naturalSize.width]
-                                           withHeight:[NSNumber numberWithFloat:track.naturalSize.height]
-                                             withMime:@"video/mp4"
-                                             withSize:fileSizeValue
-                                         withDuration:[NSNumber numberWithFloat:milliseconds]
-                                             withData:nil
-                                             withRect:CGRectNull
-                                     withCreationDate:nil
-                                 withModificationDate:nil
-                        ]);
-        } else {
-            completion(nil);
-        }
-    }];
+    NSNumber *fileSizeValue = [NSNumber numberWithInt:55545];
+    [outputURL getResourceValue:&fileSizeValue
+                         forKey:NSURLFileSizeKey
+                          error:nil];
+    
+    AVURLAsset *durationFromUrl = [AVURLAsset assetWithURL:outputURL];
+    CMTime time = [durationFromUrl duration];
+    int milliseconds = ceil(time.value/time.timescale) * 1000;
+    
+    completion([self createAttachmentResponse:[outputURL absoluteString]
+                                     withExif:nil
+                                withSourceURL:[sourceURL absoluteString]
+                          withLocalIdentifier:localIdentifier
+                                 withFilename:fileName
+                                    withWidth:[NSNumber numberWithFloat:track.naturalSize.width]
+                                   withHeight:[NSNumber numberWithFloat:track.naturalSize.height]
+                                     withMime:@"video/mp4"
+                                     withSize:fileSizeValue
+                                 withDuration:[NSNumber numberWithFloat:milliseconds]
+                                     withData:nil
+                                     withRect:CGRectNull
+                             withCreationDate:nil
+                         withModificationDate:nil
+                ]);
 }
 
 - (void) getVideoAsset:(PHAsset*)forAsset completion:(void (^)(NSDictionary* image))completion {

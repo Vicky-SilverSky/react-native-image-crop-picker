@@ -873,7 +873,8 @@ RCT_EXPORT_METHOD(openCropper:(NSDictionary *)options
         cropVC.aspectRatioLockEnabled = ![[self.options objectForKey:@"freeStyleCropEnabled"] boolValue];
         cropVC.resetAspectRatioEnabled = !cropVC.aspectRatioLockEnabled;
     }
-    
+
+    cropVC.aspectRatioPreset = TOCropViewControllerAspectRatioPreset16x9;
     cropVC.title = [[self options] objectForKey:@"cropperToolbarTitle"];
     cropVC.delegate = self;
     
